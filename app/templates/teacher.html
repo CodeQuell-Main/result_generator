@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Teacher Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #f4f6fa;
+    }
+
+    header {
+      background: #1f2937;
+      color: white;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 22px;
+      font-weight: bold;
+      box-shadow: 0px 3px 6px rgba(0,0,0,0.2);
+    }
+
+    .menu-toggle {
+      display: none;
+      font-size: 22px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: white;
+    }
+
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    nav {
+      width: 240px;
+      background: #111827;
+      color: white;
+      padding-top: 20px;
+      flex-shrink: 0;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    nav a {
+      display: block;
+      padding: 14px 22px;
+      color: #d1d5db;
+      text-decoration: none;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    nav a:hover, nav a.active {
+      background: #2563eb;
+      color: white;
+      border-radius: 6px;
+      margin: 4px 10px;
+    }
+
+    main {
+      flex-grow: 1;
+      padding: 30px;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #2563eb;
+      font-size: 22px;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
+    }
+
+    form label {
+      font-weight: 500;
+      margin-top: 12px;
+      display: block;
+      color: #374151;
+    }
+
+    form input, form select, form button {
+      display: block;
+      width: 100%;
+      margin: 8px 0 16px 0;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 15px;
+    }
+
+    form input:focus, form select:focus {
+      outline: none;
+      border: 1px solid #2563eb;
+      box-shadow: 0px 0px 4px rgba(37,99,235,0.3);
+    }
+
+    form button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    form button:hover {
+      background: #1e40af;
+    }
+
+    section {
+      display: none;
+    }
+
+    section.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .welcome {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
+    }
+
+    /* ✅ Responsive Styles */
+    @media (max-width: 1024px) {
+      main {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        z-index: 1000;
+      }
+      nav.active {
+        transform: translateX(0);
+      }
+      .menu-toggle {
+        display: block;
+      }
+      .container {
+        flex-direction: column;
+      }
+      main {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        font-size: 18px;
+        padding: 12px;
+      }
+      form input, form select, form button {
+        font-size: 14px;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Teacher Dashboard
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+  </header>
+  <div class="container">
+    <nav id="sidebar">
+      <a href="#" class="active" onclick="showSection('marks', this)">📊 Upload Marks</a>
+    </nav>
+    <main>
+      <div class="welcome">
+        <h2>👋 Welcome, Teacher!</h2>
+      </div>
+
+      <!-- Only Upload Marks Section -->
+      <section id="marks" class="card active">
+        <h2>Upload Marks</h2>
+        <form>
+          <label for="marksClass">Select Class</label>
+          <select id="marksClass" required>
+            <option value="">-- Choose Class --</option>
+            <option value="Class 10">Class 10</option>
+            <option value="Class 11">Class 11</option>
+            <option value="Class 12">Class 12</option>
+          </select>
+
+          <label for="marksExam">Select Exam</label>
+          <select id="marksExam" required>
+            <option value="">-- Choose Exam --</option>
+            <option value="Midterm">Midterm</option>
+            <option value="Final">Final</option>
+            <option value="Unit Test">Unit Test</option>
+          </select>
+
+          <label for="marksFile">Upload Marks File</label>
+          <input type="file" id="marksFile" required>
+          <button type="submit">📌 Upload</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function showSection(sectionId, element) {
+      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+      document.getElementById(sectionId).classList.add("active");
+
+      document.querySelectorAll("nav a").forEach(link => link.classList.remove("active"));
+      element.classList.add("active");
+
+      if (window.innerWidth <= 768) toggleMenu(); // auto-close menu on mobile
+    }
+
+    function toggleMenu() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
+  </script>
+</body>
+</html>
