@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #f4f6fa;
+    }
+
+    header {
+      background: #1f2937;
+      color: white;
+      padding: 18px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      box-shadow: 0px 3px 6px rgba(0,0,0,0.2);
+    }
+
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    nav {
+      width: 240px;
+      background: #111827;
+      color: white;
+      padding-top: 20px;
+      flex-shrink: 0;
+    }
+
+    nav a {
+      display: block;
+      padding: 14px 22px;
+      color: #d1d5db;
+      text-decoration: none;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    nav a:hover, nav a.active {
+      background: #2563eb;
+      color: white;
+      border-radius: 6px;
+      margin: 4px 10px;
+    }
+
+    main {
+      flex-grow: 1;
+      padding: 30px;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #2563eb;
+      font-size: 22px;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      margin-bottom: 25px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
+    }
+
+    form label {
+      font-weight: 500;
+      margin-top: 12px;
+      display: block;
+      color: #374151;
+    }
+
+    form select {
+      display: block;
+      width: 100%;
+      margin: 8px 0 16px 0;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 15px;
+      background: white;
+      cursor: pointer;
+    }
+
+    form select:focus {
+      outline: none;
+      border: 1px solid #2563eb;
+      box-shadow: 0px 0px 4px rgba(37,99,235,0.3);
+    }
+
+    .welcome {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .info p {
+      font-size: 16px;
+      margin: 8px 0;
+      color: #374151;
+    }
+
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .results-table th,
+    .results-table td {
+      border: 1px solid #e5e7eb;
+      padding: 12px;
+      text-align: left;
+    }
+
+    .results-table th {
+      background-color: #f9fafb;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .results-table tr:nth-child(even) {
+      background-color: #f9fafb;
+    }
+
+    .download-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .download-btn:hover {
+      background: #1e40af;
+    }
+
+    /* Toast Styles */
+    .toast {
+      visibility: hidden;
+      min-width: 280px;
+      margin-left: -140px;
+      background: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 8px;
+      padding: 16px;
+      position: fixed;
+      z-index: 1000;
+      left: 50%;
+      bottom: 30px;
+      font-size: 1rem;
+      opacity: 0;
+      transition: opacity 0.5s, bottom 0.5s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .toast.show {
+      visibility: visible;
+      opacity: 1;
+      bottom: 50px;
+    }
+
+    .toast.success {
+      background: #38a169;
+    }
+
+    .toast.error {
+      background: #e53e3e;
+    }
+
+    /* 📱 Responsive Styles */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      nav {
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 0;
+      }
+
+      nav a {
+        font-size: 14px;
+        padding: 10px;
+        margin: 0;
+      }
+
+      main {
+        padding: 15px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        font-size: 20px;
+        padding: 14px;
+      }
+
+      nav {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      nav a {
+        padding: 12px;
+        font-size: 15px;
+      }
+
+      h2 {
+        font-size: 18px;
+      }
+
+      form select {
+        font-size: 14px;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>Student Dashboard</header>
+  <div class="container">
+    <nav>
+      <a href="#" class="active">📊 Results</a>
+    </nav>
+    <main>
+      <div class="welcome">
+        <h2>👋 Welcome, <span id="studentName">Student</span>!</h2>
+        <p>Use the sidebar to view your profile and results.</p>
+      </div>
+
+      <!-- Profile Section -->
+      <section id="profile" class="card">
+        <h2>Profile</h2>
+        <div class="info">
+          <p><strong>Name:</strong> <span id="profileName">Loading...</span></p>
+          <p><strong>Roll Number:</strong> <span id="profileUsername">Loading...</span></p>
+          <p><strong>Class:</strong> <span id="profileClass">Loading...</span></p>
+        </div>
+      </section>
+
+      <!-- Results Section -->
+      <section id="results" class="card">
+        <h2>View Results</h2>
+        <form id="examSelectForm">
+          <label for="examSelect">Select Exam</label>
+          <select id="examSelect" name="exam_id" required>
+            <option value="">-- Choose Exam --</option>
+            <!-- Exams will be populated dynamically -->
+          </select>
+        </form>
+        
+        <div id="resultsDisplay" style="display: none;">
+          <h3>Exam Results</h3>
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Code</th>
+                <th>Marks</th>
+                <th>Max Marks</th>
+                <th>Percentage</th>
+              </tr>
+            </thead>
+            <tbody id="resultsTableBody">
+              <!-- Results will be populated dynamically -->
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"><strong>Total</strong></td>
+                <td id="totalMarks"><strong>0</strong></td>
+                <td id="totalMaxMarks"><strong>0</strong></td>
+                <td id="totalPercentage"><strong>0%</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+          
+          <button class="download-btn" onclick="downloadPDF()">📄 Download PDF</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // Show toast notification
+    function showToast(message, type = "success") {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.className = `toast show ${type}`;
+
+      setTimeout(() => {
+        toast.className = toast.className.replace("show", "");
+      }, 3000);
+    }
+
+    // Fetch student profile
+    async function fetchProfile() {
+      try {
+        const response = await fetch('/student/profile');
+        if (response.ok) {
+          const profile = await response.json();
+          
+          document.getElementById('studentName').textContent = profile.name;
+          document.getElementById('profileName').textContent = profile.name;
+          document.getElementById('profileUsername').textContent = profile.username;
+          document.getElementById('profileClass').textContent = profile.class || 'Not assigned';
+        } else {
+          showToast('Failed to fetch profile', 'error');
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        showToast('Error fetching profile', 'error');
+      }
+    }
+
+    // Fetch available exams
+    async function fetchExams() {
+      try {
+        const response = await fetch('/student/exams');
+        if (response.ok) {
+          const exams = await response.json();
+          const dropdown = document.getElementById('examSelect');
+          
+          // Clear existing options except the first one
+          while (dropdown.options.length > 1) {
+            dropdown.remove(1);
+          }
+
+          // Add exams to dropdown
+          exams.forEach(exam => {
+            const option = document.createElement('option');
+            option.value = exam.id;
+            option.textContent = exam.name;
+            dropdown.appendChild(option);
+          });
+        } else {
+          showToast('Failed to fetch exams', 'error');
+        }
+      } catch (error) {
+        console.error('Error fetching exams:', error);
+        showToast('Error fetching exams', 'error');
+      }
+    }
+
+    // Fetch exam results
+    async function fetchResults(examId) {
+      try {
+        const response = await fetch(`/student/results/${examId}`);
+        if (response.ok) {
+          const results = await response.json();
+          displayResults(results);
+        } else {
+          showToast('Failed to fetch results', 'error');
+        }
+      } catch (error) {
+        console.error('Error fetching results:', error);
+        showToast('Error fetching results', 'error');
+      }
+    }
+
+    // Display results in table
+    function displayResults(results) {
+      const tableBody = document.getElementById('resultsTableBody');
+      const resultsDisplay = document.getElementById('resultsDisplay');
+      
+      // Clear existing rows
+      tableBody.innerHTML = '';
+      
+      let totalMarks = 0;
+      let totalMaxMarks = 0;
+      
+      results.forEach(result => {
+        const row = document.createElement('tr');
+        const percentage = ((result.marks / result.max_marks) * 100).toFixed(2);
+        
+        row.innerHTML = `
+          <td>${result.subject}</td>
+          <td>${result.code}</td>
+          <td>${result.marks}</td>
+          <td>${result.max_marks}</td>
+          <td>${percentage}%</td>
+        `;
+        
+        tableBody.appendChild(row);
+        
+        totalMarks += result.marks;
+        totalMaxMarks += result.max_marks;
+      });
+      
+      // Update totals
+      document.getElementById('totalMarks').textContent = totalMarks;
+      document.getElementById('totalMaxMarks').textContent = totalMaxMarks;
+      document.getElementById('totalPercentage').textContent = 
+        totalMaxMarks > 0 ? `${((totalMarks / totalMaxMarks) * 100).toFixed(2)}%` : '0%';
+      
+      // Show results
+      resultsDisplay.style.display = 'block';
+    }
+
+    // Download PDF
+    async function downloadPDF() {
+      const examId = document.getElementById('examSelect').value;
+      if (!examId) {
+        showToast('Please select an exam first', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/student/download-pdf/${examId}`);
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `exam-results-${examId}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+          showToast('PDF downloaded successfully');
+        } else {
+          showToast('Failed to download PDF', 'error');
+        }
+      } catch (error) {
+        console.error('Error downloading PDF:', error);
+        showToast('Error downloading PDF', 'error');
+      }
+    }
+
+    // Handle exam selection
+    document.getElementById('examSelect').addEventListener('change', function() {
+      const examId = this.value;
+      if (examId) {
+        fetchResults(examId);
+      } else {
+        document.getElementById('resultsDisplay').style.display = 'none';
+      }
+    });
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchProfile();
+      fetchExams();
+    });
+  </script>
+</body>
+</html>
+
+

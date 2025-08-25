@@ -143,6 +143,40 @@
       box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
     }
 
+    /* Toast Styles */
+    .toast {
+      visibility: hidden;
+      min-width: 280px;
+      margin-left: -140px;
+      background: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 8px;
+      padding: 16px;
+      position: fixed;
+      z-index: 1000;
+      left: 50%;
+      bottom: 30px;
+      font-size: 1rem;
+      opacity: 0;
+      transition: opacity 0.5s, bottom 0.5s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .toast.show {
+      visibility: visible;
+      opacity: 1;
+      bottom: 50px;
+    }
+
+    .toast.success {
+      background: #38a169;
+    }
+
+    .toast.error {
+      background: #e53e3e;
+    }
+
     /* ✅ Responsive Styles */
     @media (max-width: 1024px) {
       main {
@@ -202,30 +236,29 @@
       <!-- Only Upload Marks Section -->
       <section id="marks" class="card active">
         <h2>Upload Marks</h2>
-        <form>
+        <form id="uploadMarksForm">
           <label for="marksClass">Select Class</label>
-          <select id="marksClass" required>
+          <select id="marksClass" name="class_id" required>
             <option value="">-- Choose Class --</option>
-            <option value="Class 10">Class 10</option>
-            <option value="Class 11">Class 11</option>
-            <option value="Class 12">Class 12</option>
+            <!-- Classes will be populated dynamically -->
           </select>
 
           <label for="marksExam">Select Exam</label>
-          <select id="marksExam" required>
+          <select id="marksExam" name="exam_id" required>
             <option value="">-- Choose Exam --</option>
-            <option value="Midterm">Midterm</option>
-            <option value="Final">Final</option>
-            <option value="Unit Test">Unit Test</option>
+            <!-- Exams will be populated dynamically -->
           </select>
 
-          <label for="marksFile">Upload Marks File</label>
-          <input type="file" id="marksFile" required>
+          <label for="marksFile">Upload Marks File (Excel)</label>
+          <input type="file" id="marksFile" name="file" accept=".xlsx,.xls" required>
           <button type="submit">📌 Upload</button>
         </form>
       </section>
     </main>
   </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
 
   <script>
     function showSection(sectionId, element) {
@@ -241,6 +274,121 @@
     function toggleMenu() {
       document.getElementById("sidebar").classList.toggle("active");
     }
+
+    // Show toast notification
+    function showToast(message, type = "success") {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.className = `toast show ${type}`;
+
+      setTimeout(() => {
+        toast.className = toast.className.replace("show", "");
+      }, 3000);
+    }
+
+    // Fetch classes assigned to teacher
+    async function fetchClasses() {
+      try {
+        const response = await fetch('/teacher/classes');
+        if (response.ok) {
+          const classes = await response.json();
+          const dropdown = document.getElementById('marksClass');
+          
+          // Clear existing options except the first one
+          while (dropdown.options.length > 1) {
+            dropdown.remove(1);
+          }
+
+          // Add classes to dropdown
+          classes.forEach(cls => {
+            const option = document.createElement('option');
+            option.value = cls.id;
+            option.textContent = `${cls.name} (${cls.code})`;
+            dropdown.appendChild(option);
+          });
+        } else {
+          showToast('Failed to fetch classes', 'error');
+        }
+      } catch (error) {
+        console.error('Error fetching classes:', error);
+        showToast('Error fetching classes', 'error');
+      }
+    }
+
+    // Fetch exams for selected class
+    async function fetchExams(classId) {
+      try {
+        const response = await fetch(`/teacher/exams/${classId}`);
+        if (response.ok) {
+          const exams = await response.json();
+          const dropdown = document.getElementById('marksExam');
+          
+          // Clear existing options except the first one
+          while (dropdown.options.length > 1) {
+            dropdown.remove(1);
+          }
+
+          // Add exams to dropdown
+          exams.forEach(exam => {
+            const option = document.createElement('option');
+            option.value = exam.id;
+            option.textContent = exam.name;
+            dropdown.appendChild(option);
+          });
+        } else {
+          showToast('Failed to fetch exams', 'error');
+        }
+      } catch (error) {
+        console.error('Error fetching exams:', error);
+        showToast('Error fetching exams', 'error');
+      }
+    }
+
+    // Handle class selection change
+    document.getElementById('marksClass').addEventListener('change', function() {
+      const classId = this.value;
+      if (classId) {
+        fetchExams(classId);
+      } else {
+        // Clear exam dropdown
+        const examDropdown = document.getElementById('marksExam');
+        while (examDropdown.options.length > 1) {
+          examDropdown.remove(1);
+        }
+      }
+    });
+
+    // Handle form submission
+    document.getElementById('uploadMarksForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+
+      try {
+        const response = await fetch('/teacher/upload-marks', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          showToast('Marks uploaded successfully');
+          e.target.reset();
+        } else {
+          const error = await response.json();
+          showToast(error.message || 'Failed to upload marks', 'error');
+        }
+      } catch (error) {
+        console.error('Error uploading marks:', error);
+        showToast('Error uploading marks', 'error');
+      }
+    });
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchClasses();
+    });
   </script>
 </body>
 </html>
+
+
