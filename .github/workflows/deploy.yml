@@ -42,7 +42,7 @@ jobs:
         protocol: ftp
         port: 21
         local-dir: ./
-        server-dir: /nsglobaltech.com/
+        server-dir: /result-generator.codequell.in/
         dangerous-clean-slate: false
         exclude: |
           **/node_modules/**
