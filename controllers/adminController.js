@@ -23,7 +23,12 @@ exports.getClasses = async (req, res) => {
 // Create user
 exports.createUser = async (req, res) => {
   try {
-    const { username, password, role, name, email, class_id } = req.body;
+    let { username, password, role, name, email, class_id } = req.body;
+
+    // If password is not provided, set it to username
+    if (!password) {
+      password = username;
+    }
 
     // Check if user exists
     const existingUser = await User.findOne({ username });
