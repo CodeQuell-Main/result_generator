@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 const passport = require('passport');
 
 // Load env vars
-dotenv.config();
+dotenv.config({ quiet: true });
 
 // Import database connection
 const { testConnection } = require('./config/db');

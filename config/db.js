@@ -1,5 +1,5 @@
 const mysql = require('mysql2/promise');
-require('dotenv').config();
+require('dotenv').config({quiet: true});
 
 // Create connection pool
 const pool = mysql.createPool({
