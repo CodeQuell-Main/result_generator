@@ -28,12 +28,10 @@ jobs:
       if: steps.changes.outputs.has_changes == 'true'
       run: git diff --name-only HEAD^ HEAD
 
-    - name: � List files to upload
-      if: steps.changes.outputs.has_changes == 'true'
+    - name: 🗂 List files to upload
       run: ls -alR
 
-    - name: �🚀 FTP Deploy
-      if: steps.changes.outputs.has_changes == 'true'
+    - name:  FTP Deploy
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: ${{ secrets.FTP_HOST }}
