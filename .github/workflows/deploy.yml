@@ -28,11 +28,11 @@ jobs:
       if: steps.changes.outputs.has_changes == 'true'
       run: git diff --name-only HEAD^ HEAD
 
-    - name: 📦 Install Dependencies
+    - name: � List files to upload
       if: steps.changes.outputs.has_changes == 'true'
-      run: npm install
+      run: ls -alR
 
-    - name: 🚀 FTP Deploy
+    - name: �🚀 FTP Deploy
       if: steps.changes.outputs.has_changes == 'true'
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
