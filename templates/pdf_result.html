@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .student-info {
+            margin-bottom: 30px;
+        }
+        
+        .student-info table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .student-info td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .student-info td:first-child {
+            font-weight: bold;
+            background-color: #f5f5f5;
+            width: 30%;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .results-table th,
+        .results-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .results-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        .results-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: #e6f3ff !important;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        @media print {
+            body {
+                margin: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>EXAMINATION RESULTS</h1>
+        <h2 id="examName">Exam Name</h2>
+    </div>
+    
+    <div class="student-info">
+        <table>
+            <tr>
+                <td>Student Name:</td>
+                <td id="studentName">Student Name</td>
+            </tr>
+            <tr>
+                <td>Roll Number:</td>
+                <td id="studentRoll">Roll Number</td>
+            </tr>
+            <tr>
+                <td>Class:</td>
+                <td id="studentClass">Class</td>
+            </tr>
+            <tr>
+                <td>Exam Date:</td>
+                <td id="examDate">Exam Date</td>
+            </tr>
+        </table>
+    </div>
+    
+    <h3>Subject-wise Results</h3>
+    <table class="results-table">
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Code</th>
+                <th>Marks Obtained</th>
+                <th>Maximum Marks</th>
+                <th>Percentage</th>
+            </tr>
+        </thead>
+        <tbody id="resultsBody">
+            <!-- Results will be populated dynamically -->
+        </tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="2"><strong>TOTAL</strong></td>
+                <td id="totalMarks"><strong>0</strong></td>
+                <td id="totalMaxMarks"><strong>0</strong></td>
+                <td id="totalPercentage"><strong>0%</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+    
+    <div class="footer">
+        <p>This is a computer generated document. No signature required.</p>
+        <p>Generated on: <span id="generatedDate"></span></p>
+    </div>
+    
+    <script>
+        // This script will be executed when the PDF is generated
+        // The data will be passed from the backend
+        function populateResults(data) {
+            document.getElementById('examName').textContent = data.examName;
+            document.getElementById('studentName').textContent = data.studentName;
+            document.getElementById('studentRoll').textContent = data.studentRoll;
+            document.getElementById('studentClass').textContent = data.studentClass;
+            document.getElementById('examDate').textContent = data.examDate;
+            document.getElementById('generatedDate').textContent = new Date().toLocaleDateString();
+            
+            const resultsBody = document.getElementById('resultsBody');
+            resultsBody.innerHTML = '';
+            
+            let totalMarks = 0;
+            let totalMaxMarks = 0;
+            
+            data.results.forEach(result => {
+                const row = document.createElement('tr');
+                const percentage = ((result.marks / result.max_marks) * 100).toFixed(2);
+                
+                row.innerHTML = `
+                    <td>${result.subject}</td>
+                    <td>${result.code}</td>
+                    <td>${result.marks}</td>
+                    <td>${result.max_marks}</td>
+                    <td>${percentage}%</td>
+                `;
+                
+                resultsBody.appendChild(row);
+                
+                totalMarks += result.marks;
+                totalMaxMarks += result.max_marks;
+            });
+            
+            document.getElementById('totalMarks').textContent = totalMarks;
+            document.getElementById('totalMaxMarks').textContent = totalMaxMarks;
+            document.getElementById('totalPercentage').textContent = 
+                totalMaxMarks > 0 ? `${((totalMarks / totalMaxMarks) * 100).toFixed(2)}%` : '0%';
+        }
+    </script>
+</body>
+</html>
+
+
